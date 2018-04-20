@@ -85,7 +85,7 @@ abstract class base_optimization
       'bw'
     );
 
-    $selected_countingspots = $this->getCountingspots();//Method might not defined
+    $selected_countingspots = $this->getCountingspots();//Method is not defined
     $sums = array();
     $newdata['rows'] = array();
     $newdata['totalsum'] = array();
@@ -111,12 +111,13 @@ abstract class base_optimization
                   $banner_data = adition_base:: getInstance('banners')->getAll(
                     array('id' => $banner_id, 'with_server' => false)
                   );
-                  $banner_data = $banner_data[0];
+                  $banner_data = $banner_data[0];// Need to check index 0
                   $campaignbanners = adition_base:: getInstance('campaignbanners')->getCampaigns($banner_data['id']);
-                  $campaign_id = $campaignbanners[$banner_data['id']][0];
+                  $campaign_id = $campaignbanners[$banner_data['id']][0];// Need to check indexes "id" and 0
 
                   //$campaign_costs = adition_base::getInstance('campaigncosts')->getOne($campaign_id);
 
+                    // Check if $landingpage_data is not empty
                   $newrow = array(
                     'date' => $date,
                     'landingpage_name' => $landingpage_data['name'],
@@ -150,6 +151,8 @@ abstract class base_optimization
         }
       }
     }
+
+    // $totalsum = array(); Better to set variable since it is used further
     foreach ($sums as $sum) {
       foreach ($sum as $key => $value) {
         $totalsum[$key] += $value;
