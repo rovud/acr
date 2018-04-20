@@ -5,7 +5,7 @@ abstract class base_optimization
   public $concrete_network_setting;
 
   /** determines optimization type. has to be set in sub classes*/
-  protected $opt_type;
+  protected $opt_type;// But is does not set in sub classes
 
   /** array mit allen Kampagnen die nicht durch die Filter gefallen sind */
   protected $data;
@@ -92,6 +92,7 @@ abstract class base_optimization
 
     // Better to first check the second condition as it costs less than the first one
       // Also there are too much nested conditions and cycles. Need to reorganize this part
+      // and put cycles and conditions into functions
     if (is_array($rows['days']) && !empty($selected_countingspots)) {
       $index = 0;
       foreach ($rows['days'] as $date => $date_values) {
@@ -151,14 +152,14 @@ abstract class base_optimization
     }
     foreach ($sums as $sum) {
       foreach ($sum as $key => $value) {
-        $totalsum[$key] += $value;// Undefined variable $totalsum
+        $totalsum[$key] += $value;
       }
     }
     $this->row['cpl_by_contentunit'] = $newdata['rows'];
-    $this->row['cpl'] = $totalsum['unique_clicks'] + $totalsum['unique_views'];
+    $this->row['cpl'] = $totalsum['unique_clicks'] + $totalsum['unique_views'];// $totalsum may not defined
   }
 
-  // This function is redudant in the given context. Better to use (int)$a at all invokation places
+  // This function is redudant in the given context. Better to use (int)$a at all places of invokation
   protected function convertNumber($a)
   {
     if (!isset($a) or $a == null) {
