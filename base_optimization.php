@@ -53,7 +53,7 @@ abstract class base_optimization
 
   public function get_posttracking_report()
   {
-    $this->getRow();
+    $this->getRow();// Method may not exist and should be declared as abstract
     $pages = $this->campLandingpages->getAll(array('campaign_id' => $this->row['campaign_id']));
 
 
@@ -85,15 +85,17 @@ abstract class base_optimization
       'bw'
     );
 
-    $selected_countingspots = $this->getCountingspots();
+    $selected_countingspots = $this->getCountingspots();//Method might not defined
     $sums = array();
     $newdata['rows'] = array();
     $newdata['totalsum'] = array();
 
+    // Better to first check the second condition as it costs less than the first one
+      // Also there are too much nested conditions and cycles. Need to reorganize this part
     if (is_array($rows['days']) && !empty($selected_countingspots)) {
       $index = 0;
       foreach ($rows['days'] as $date => $date_values) {
-        $index += 1;
+        $index += 1;// Can be safely replaced with $index++
         // LandingpageID
         foreach ($date_values as $landingpage_id => $landingpage_values) {
           $landingpage_data = adition_base:: getInstance('landingpages')->getOne($landingpage_id);
@@ -128,7 +130,7 @@ abstract class base_optimization
                     'campaign_costs' => ''/* $campaign_costs */,
                   );
                   $newrow['visits_clicks'] = $this->convertNumber($banner_value['visits']['clicks']);
-                  $sums[$newrow[$key]]['visits_clicks'] += $newrow['visits_clicks'];
+                  $sums[$newrow[$key]]['visits_clicks'] += $newrow['visits_clicks'];// undefined variable $key
                   $newrow['visits_views'] = $this->convertNumber($banner_value['visits']['views']);
                   $sums[$newrow[$key]]['visits_views'] += $newrow['visits_views'];
                   $newrow['unique_clicks'] = $this->convertNumber($banner_value['unique']['clicks']);
@@ -149,12 +151,14 @@ abstract class base_optimization
     }
     foreach ($sums as $sum) {
       foreach ($sum as $key => $value) {
-        $totalsum[$key] += $value;
+        $totalsum[$key] += $value;// Undefined variable $totalsum
       }
     }
     $this->row['cpl_by_contentunit'] = $newdata['rows'];
     $this->row['cpl'] = $totalsum['unique_clicks'] + $totalsum['unique_views'];
   }
+
+  // This function is redudant in the given context. Better to use (int)$a at all invokation places
   protected function convertNumber($a)
   {
     if (!isset($a) or $a == null) {
@@ -169,6 +173,12 @@ abstract class base_optimization
       $this->set_priority_if_not_in_network_range();
       $this->row['datetime'] = true;
 
+      // Better to change the following to
+        /*
+         if ($this->debugmode) {
+            return;
+         }
+        */
       if (!$this->debugmode) {
         if (isset($this->row['campaign_data']['priority_hacked'])) {
           $this->row['campaign_data']['weight'] = $this->row['campaign_data']['priority'];
@@ -250,12 +260,14 @@ abstract class base_optimization
     rpcMiddlewareStorageException::throwForMdb2Error($result);
   }
 
+  // Method must be abstract
   # overwritten me in subclass
   protected function set_priority_if_not_in_network_range()
   {
     ;
   }
 
+    // Method must be abstract
   # overwrite me in subclass
   protected function post_replace_data()
   {
@@ -264,14 +276,15 @@ abstract class base_optimization
 
   protected function get_start_date_for_post_report()
   {
-    if ($this->concrete_network_setting['runtime'] == 'lastrun') {
+    if ($this->concrete_network_setting['runtime'] == 'lastrun') {// Better to use === here
       if (strtotime($this->row['lastrun']) <= time() - (adReportConst::getReportConfig()->getSoapReportMaxDays() * 24 * 3600)) {
         $this->row['postreport_startdate'] = date('Y-m-d', time() - (adReportConst::getReportConfig()->getSoapReportMaxDays() * 24 * 3600));
       } else {
         $this->row['postreport_startdate'] = $this->row['lastrun'];
       }
     }
-    if ($this->concrete_network_setting['runtime'] == 'campaign') {
+    if ($this->concrete_network_setting['runtime'] == 'campaign') {// Better to use === here
+      // Use count function instead of sizeof, sizeof is just an alias to count
       if (strtotime($this->row['runtimes'][sizeof($this->row['runtimes']) - 1]['startdate']) <= time() - (adReportConst::getReportConfig()->getSoapReportMaxDays() * 24 * 3600)) {
         $this->row['postreport_startdate'] = date('Y-m-d', time() - (adReportConst::getReportConfig()->getSoapReportMaxDays() * 24 * 3600));
       } else {
